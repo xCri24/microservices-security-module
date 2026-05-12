@@ -1,4 +1,4 @@
-# OAuth2 
+# OAuth2 and Keycloak
 
 ## The nuts and bolts of OAuth2
 
