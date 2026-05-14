@@ -15,25 +15,26 @@ For simplicity and reproducibility, we will run Keycloak through Docker and Dock
 To start a basic Keycloak instance we can use the following `compose.yml` file:
 
 ```yaml
-keycloak:
+  keycloak:
     build:
       context: .
-      dockerfile: ./path/to/Dockerfile
-      network: host
-    entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev"]
-    environment:
-      - KC_HOSTNAME=localhost
-      - KC_HOSTNAME_PORT=8080
+      dockerfile: ./keycloak/Dockerfile 
+      network: host 
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev"] 
+    environment: #variabili di configurazione
+      - KC_HOSTNAME=localhost #192.168.1.108
+      - KC_HOSTNAME_PORT=7777
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
     ports:
-      - 8080:8080
+      - 7777:8080
 ```
-
+In general this code: defines a service called keycloak, build the Docker image, starts Keycloak in development mode, exposes the service on port 7777. 
 Keycloak requires a Dockerfile because it needs to generate a private/public keypair for cryptographic operations.
 
+Docker file:
 ```Dockerfile
 FROM quay.io/keycloak/keycloak:latest as builder
 
@@ -67,7 +68,7 @@ This setup is intentionally simplified and is not production ready. In particula
 Once the container is running, navigate to:
 
 ```text
-http://localhost:8080
+http://localhost:7777
 ```
 
 and login using the default credentials:
@@ -79,7 +80,7 @@ password: admin
 
 The Keycloak home page should look similar to the following image:
 
-![](images/keycloak_1.png)
+![](images/keycloak_homepage.png)
 
 Keycloak introduces the concept of realms as a way to namespace configurations, applications, and users.
 
@@ -91,13 +92,12 @@ Keycloak creates a default `master` realm used for administration purposes. This
 
 To create a new realm:
 1. click on the top-left dropdown menu;
-2. select `Create Realm`.
+2. select `Menage Realms`,
+3. and select `Create Realm`.
 
-![](images/keycloak_2.png)
+![](images/keycloak_create.png)
 
 Insert the realm name and proceed.
-
-![](images/keycloak_3.png)
 
 ---
 
@@ -129,13 +129,13 @@ Clients
 
 The interface should look similar to the following image:
 
-![](images/keycloak_4.png)
+![](images/keycloak_managerealms.png)
 
 Click on `Create Client`.
 
 Insert the desired `client_id` and continue.
 
-![](images/keycloak_5.png)
+![](images/keycloak_Settings.png)
 
 The next step is selecting which OAuth2 flows the client will support.
 
@@ -143,7 +143,7 @@ The most common options are:
 - Standard Flow
 - Service Accounts Roles
 
-![](images/keycloak_6.png)
+![](images/keycloak_config.png)
 
 Enabling `Client authentication` makes the client confidential, which allows secure backend authentication using a client secret.
 
@@ -153,7 +153,7 @@ Enabling `Client authentication` makes the client confidential, which allows sec
 
 The login settings screen defines the URLs used during OAuth2 authentication flows.
 
-![](images/keycloak_7.png)
+![](images/keycloak_Settings_3.png)
 
 The most important field is:
 
@@ -163,7 +163,7 @@ Redirect URIs represent the backend endpoints that receive the authorization cod
 
 During the Authorization Code Flow, once the user successfully authenticates, Keycloak redirects the user to one of these configured endpoints together with the generated authorization code.
 
-![](images/auth_code_flow_marked.png)
+![](images/keycloak_errore.png)
 
 For this demonstration we do not yet have a real backend application, therefore any placeholder URI can be used.
 
@@ -193,7 +193,7 @@ and then:
 OpenID Endpoint Configuration
 ```
 
-![](images/keycloak_9.png)
+![](images/keycloak_RealmSettings.png)
 
 A JSON document containing all OpenID and OAuth2 endpoints will appear.
 
@@ -206,14 +206,34 @@ The `authorization_endpoint` is used to start the login flow.
 The `token_endpoint` is used to exchange authorization codes for tokens.
 
 ---
+## Creating a Test User
 
-## Simulating the Authorization Code Flow
+Before simulating the Authorization Code Flow, we need a user inside the realm.
 
-To start the login flow, the `authorization_endpoint` must be called with the following mandatory query parameters:
+From the left-side menu select:
 
 ```text
-response_type=code
-client_id=example-client
+Users
+```
+
+and click on:
+
+```text
+Create new user
+```
+
+Insert a username and create the user.
+
+Once the user is created, navigate to the `Credentials` tab and set a password.
+
+Disable the `Temporary` option and confirm the password creation.
+
+The user can now authenticate through the Keycloak login page.
+## Simulating the Authorization Code Flow
+
+To start the login flow, copy the `authorization_endpoint` and add at the end:
+```text
+?response_type=code&client_id=example-client
 ```
 
 Example:
@@ -226,7 +246,7 @@ Open the URL inside an incognito browser window.
 
 The login page should appear as follows:
 
-![](images/keycloak_10.png)
+![](images/keycloak_loginPrivate.png)
 
 Authenticate using the previously configured credentials.
 
@@ -255,7 +275,7 @@ The request body should contain:
 - `grant_type`
 - `code`
 
-![](images/postman_1.png)
+![](images/postman.png)
 
 The `grant_type` used in this flow is:
 
