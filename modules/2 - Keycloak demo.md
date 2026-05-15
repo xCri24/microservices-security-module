@@ -31,10 +31,15 @@ To start a basic Keycloak instance we can use the following `compose.yml` file:
     ports:
       - 7777:8080
 ```
-In general this code: defines a service called keycloak, build the Docker image, starts Keycloak in development mode, exposes the service on port 7777. 
+In general, this configuration:
+- defines a service called `keycloak`;
+- builds the Docker image;
+- starts Keycloak in development mode;
+- exposes the service on port `7777`.
+
 Keycloak requires a Dockerfile because it needs to generate a private/public keypair for cryptographic operations.
 
-Docker file:
+Dockerfile:
 ```Dockerfile
 FROM quay.io/keycloak/keycloak:latest as builder
 
@@ -92,7 +97,7 @@ Keycloak creates a default `master` realm used for administration purposes. This
 
 To create a new realm:
 1. click on the top-left dropdown menu;
-2. select `Menage Realms`,
+2. select `Manage Realms`,
 3. and select `Create Realm`.
 
 ![](images/keycloak_create.png)
@@ -234,7 +239,7 @@ To start the login flow, copy the `authorization_endpoint` and add at the end:
 Example:
 
 ```text
-http://localhost:8080/realms/test-realm/protocol/openid-connect/auth?response_type=code&client_id=example-client
+http://localhost:7777/realms/test-realm/protocol/openid-connect/auth?response_type=code&client_id=example-client
 ```
 
 Open the URL inside an incognito browser window.
@@ -255,6 +260,7 @@ The redirected URL will contain several query parameters, including:
 ![](images/keycloak_errore.png)
 
 The `code` parameter is the authorization code generated during the OAuth2 flow.
+The authorization code is short-lived and can only be used once.
 
 This authorization code can now be exchanged for tokens through the `token_endpoint`.
 
