@@ -1,4 +1,4 @@
-# Keycloak and OAuth2 in Practice
+# Keycloak and OAuth2 Demo
 
 ## Keycloak
 
@@ -129,7 +129,7 @@ Clients
 
 The interface should look similar to the following image:
 
-![](images/keycloak_managerealms.png)
+![](images/keycloak_createclient.png)
 
 Click on `Create Client`.
 
@@ -163,7 +163,7 @@ Redirect URIs represent the backend endpoints that receive the authorization cod
 
 During the Authorization Code Flow, once the user successfully authenticates, Keycloak redirects the user to one of these configured endpoints together with the generated authorization code.
 
-![](images/keycloak_errore.png)
+
 
 For this demonstration we do not yet have a real backend application, therefore any placeholder URI can be used.
 
@@ -172,11 +172,6 @@ For example:
 ```text
 http://test.whatever
 ```
-
-Once the client is created, the following screen should appear:
-
-![](images/keycloak_8.png)
-
 ---
 
 ## OpenID Endpoint Configuration
@@ -193,7 +188,7 @@ and then:
 OpenID Endpoint Configuration
 ```
 
-![](images/keycloak_RealmSettings.png)
+![](images/keycloak_openID.png)
 
 A JSON document containing all OpenID and OAuth2 endpoints will appear.
 
@@ -257,7 +252,7 @@ The redirected URL will contain several query parameters, including:
 - `iss`
 - `code`
 
-![](images/keycloak_11.png)
+![](images/keycloak_errore.png)
 
 The `code` parameter is the authorization code generated during the OAuth2 flow.
 
@@ -287,6 +282,10 @@ Once the request is sent, Keycloak returns:
 - an access token
 - a refresh token
 
-![](images/postman_2.png)
+![](images/result.png)
+
+The `access_token` is the credential that will be attached to authenticated requests towards protected microservices.
+
+The `refresh_token` can instead be used to obtain new access tokens once the current one expires, without requiring the user to authenticate again.
 
 The Authorization Code Flow is now complete and authenticated requests can be performed towards protected microservices.
