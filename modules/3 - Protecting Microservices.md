@@ -147,3 +147,4 @@ In practice, authentication becomes a distributed responsibility shared by all p
 
 This is one of the key differences between monolithic and microservice-based security architectures.
 
+![](images/microservice_token_propagation.jpeg)
